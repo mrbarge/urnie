@@ -1,0 +1,18 @@
+{% extends 'layout.html' %}
+
+{%  block body %}
+
+<div class="content">
+
+<div class="pending">
+    Pending
+    {{ pending_table }}
+</div>
+
+<div class="approved">
+    Approved
+    {{ approved_table }}
+</div>
+
+</div>
+{% endblock %}

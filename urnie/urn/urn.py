@@ -1,7 +1,7 @@
 from urnie.models import db, Uri
 from urnie.urn.tables import UrnResults
 from urnie.urn.forms import AddUriForm
-from flask import Blueprint, render_template, current_app, request, url_for, redirect
+from flask import Blueprint, render_template, current_app, request, url_for, redirect, flash
 
 urn_bp = Blueprint('urn_bp', __name__,
                    template_folder='templates',
@@ -10,7 +10,7 @@ urn_bp = Blueprint('urn_bp', __name__,
 
 @urn_bp.route('/')
 def list():
-    all_uris = Uri.query.all()
+    all_uris = Uri.query.filter_by(approved=True).all()
     results = [
         {
             "urn": uri.key,
@@ -37,7 +37,7 @@ def add():
 
     if request.method == 'POST':
         if add_form.validate():
-            uri = request.form['uri']
+            uri = request.form['urn']
             url = request.form['url']
 
             existing_uri = Uri.query.filter_by(key=uri).first()
@@ -45,6 +45,9 @@ def add():
                 u = Uri(key=uri, url=url, approved=False)
                 db.session.add(u)
                 db.session.commit()
+                flash(f'URN request "{uri}" has been submitted for approval.', 'info')
+            else:
+                flash(f'URN "{uri}" is already taken.', 'error')
 
             return redirect(url_for('urn_bp.list'))
 
