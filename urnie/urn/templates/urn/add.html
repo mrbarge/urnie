@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Add</title>
+</head>
+<body>
+   <form action="" method="post" novalidate>
+        {{ form.hidden_tag() }}
+        <p>
+            {{ form.uri.label }}<br>
+            {{ form.uri }}
+        </p>
+        <p>
+            {{ form.url.label }}<br>
+            {{ form.url }}
+        </p>
+        <p>{{ form.submit() }}</p>
+   </form>
+</body>
+</html>
