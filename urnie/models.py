@@ -10,16 +10,17 @@ def load_user(user_id):
         return User.query.get(user_id)
     return None
 
+
 class User(UserMixin, db.Model):
     __tablename__ = 'users'
 
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100),nullable=False,unique=False)
-    email = db.Column(db.String(40),unique=True,nullable=False)
-    password = db.Column(db.String(200),primary_key=False,unique=False,nullable=False)
+    name = db.Column(db.String(100), nullable=False, unique=False)
+    email = db.Column(db.String(40), unique=True, nullable=False)
+    password = db.Column(db.String(200), primary_key=False, unique=False, nullable=False)
 
     def set_password(self, password):
-        self.password = generate_password_hash(password,method='sha256')
+        self.password = generate_password_hash(password, method='sha256')
 
     def check_password(self, password):
         return check_password_hash(self.password, password)
@@ -41,7 +42,6 @@ class Uri(db.Model):
         self.key = key
         self.url = url
         self.approved = approved
-
 
     def __repr__(self):
         return '<id {}>'.format(self.id)

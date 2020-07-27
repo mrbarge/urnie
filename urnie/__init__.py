@@ -23,22 +23,21 @@ def create_app():
     if 'APP_CONFIG_FILE' in os.environ:
         app.config.from_envvar('APP_CONFIG_FILE')
 
-    # app = Flask(__name__)
-    # app.config.from_object(os.environ['APP_SETTINGS'])
-
     from urnie.models import Uri, User
-    # from project import models
 
     db.init_app(app)
     login_manager.init_app(app)
+    login_manager.login_view = 'auth_bp.login'
     migrate.init_app(app, db)
 
     with app.app_context():
         from urnie.admin.admin import admin_bp
         from urnie.urn.urn import urn_bp
+        from urnie.auth.auth import auth_bp
 
         # add blueprints
         app.register_blueprint(urn_bp, url_prefix='/urn')
         app.register_blueprint(admin_bp, url_prefix='/admin')
+        app.register_blueprint(auth_bp, url_prefix='/auth')
 
         return app

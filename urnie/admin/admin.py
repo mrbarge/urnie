@@ -1,5 +1,6 @@
 from urnie.admin.tables import PendingApproval, Approved
 from flask import Blueprint, render_template, redirect, url_for, flash, request
+from flask_login import login_required, login_manager
 from urnie.models import db, Uri
 from urnie.urn.forms import AddUriForm
 
@@ -9,6 +10,7 @@ admin_bp = Blueprint('admin_bp', __name__,
 
 
 @admin_bp.route('/', methods=['GET', 'POST'])
+@login_required
 def list():
     pending_urns = Uri.query.filter_by(approved=False).all()
     pending_results = [
@@ -31,6 +33,7 @@ def list():
 
 
 @admin_bp.route('/approve/<urn>', methods=['GET', 'POST'])
+@login_required
 def approve(urn):
     db_uri = Uri.query.filter_by(key=urn).first()
     if db_uri is not None:
@@ -44,6 +47,7 @@ def approve(urn):
 
 
 @admin_bp.route('/update/<urn>', methods=['GET', 'POST'])
+@login_required
 def update(urn):
     db_uri = Uri.query.filter_by(key=urn).first()
     update_form = AddUriForm()
@@ -62,6 +66,7 @@ def update(urn):
 
 
 @admin_bp.route('/delete/<urn>', methods=['POST', 'DELETE'])
+@login_required
 def delete(urn):
     db_uri = Uri.query.filter_by(key=urn).first()
     if db_uri is not None:
