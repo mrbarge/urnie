@@ -6,6 +6,7 @@ from flask_redis import FlaskRedis
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from flask_table import Table, Col
+from flask_bootstrap import Bootstrap
 
 # add DB
 db = SQLAlchemy()
@@ -29,6 +30,7 @@ def create_app():
     login_manager.init_app(app)
     login_manager.login_view = 'auth_bp.login'
     migrate.init_app(app, db)
+    bootstrap = Bootstrap(app)
 
     with app.app_context():
         from urnie.admin.admin import admin_bp
