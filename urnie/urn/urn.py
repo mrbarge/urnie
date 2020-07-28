@@ -20,6 +20,8 @@ def list():
         } for uri in all_uris
     ]
     table = UrnResults(results)
+    table.classes = ['table']
+
     return render_template('urn/list.html', table=table)
 
 

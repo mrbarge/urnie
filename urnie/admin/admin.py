@@ -28,7 +28,9 @@ def list():
     ]
 
     pending_table = PendingApproval(pending_results)
+    pending_table.classes = ['table']
     approved_table = Approved(approved_results)
+    approved_table.classes = ['table']
     return render_template('admin/approve.html', pending_table=pending_table, approved_table=approved_table)
 
 
