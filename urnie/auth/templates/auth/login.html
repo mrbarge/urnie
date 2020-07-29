@@ -16,8 +16,9 @@
     <form method="POST" action="">
       {{ form.csrf_token }}
 
+      <p>
       <fieldset class="email">
-        {{ form.email.label }}
+        {{ form.email.label }}<br>
         {{ form.email(placeholder='youremail@example.com') }}
         {% if form.email.errors %}
           <ul class="errors">
@@ -26,9 +27,11 @@
           </ul>
         {% endif %}
       </fieldset>
+      </p>
 
+      <p>
       <fieldset class="password">
-        {{ form.password.label }}
+        {{ form.password.label }}<br>
         {{ form.password }}
         {% if form.email.errors %}
           <ul class="errors">
@@ -37,10 +40,13 @@
           </ul>
         {% endif %}
       </fieldset>
+      </p>
 
+      <p>
       <div class="submit-button">
         {{ form.submit }}
       </div>
+      </p>
 
     </form>
   </div>

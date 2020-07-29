@@ -1,6 +1,6 @@
 from urnie.models import db, Uri
 from urnie.urn.tables import UrnResults
-from urnie.urn.forms import AddUriForm
+from urnie.urn.forms import AddUriForm, ListUrnsForm
 from flask import Blueprint, render_template, current_app, request, url_for, redirect, flash
 
 urn_bp = Blueprint('urn_bp', __name__,
@@ -22,7 +22,33 @@ def list():
     table = UrnResults(results)
     table.classes = ['table']
 
-    return render_template('urn/list.html', table=table)
+    search_form = ListUrnsForm()
+
+    return render_template('urn/list.html', form=search_form, table=table)
+
+
+@urn_bp.route('/search', methods=['POST'])
+def search():
+    search_form = ListUrnsForm()
+
+    if search_form.validate_on_submit():
+        term = search_form.search.data
+        if term:
+            all_uris = Uri.query.filter((Uri.approved == True) & ((Uri.key.like(f"%{term}%")) | (Uri.url.like(f"%{term}%")))).all()
+            results = [
+                {
+                    "urn": uri.key,
+                    "url": uri.url,
+                    "approved": uri.approved,
+                    "date_added": uri.date_added
+                } for uri in all_uris
+            ]
+            table = UrnResults(results)
+            table.classes = ['table']
+
+            return render_template('urn/list.html', form=search_form, table=table)
+
+    return redirect(url_for('urn_bp.list'))
 
 
 @urn_bp.route('/<urn>', methods=['GET'])

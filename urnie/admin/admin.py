@@ -1,3 +1,5 @@
+import datetime
+
 from urnie.admin.tables import PendingApproval, Approved
 from flask import Blueprint, render_template, redirect, url_for, flash, request
 from flask_login import login_required, login_manager
@@ -40,6 +42,7 @@ def approve(urn):
     db_uri = Uri.query.filter_by(key=urn).first()
     if db_uri is not None:
         db_uri.approved = True
+        db_uri.date_added = datetime.datetime.utcnow()
         db.session.commit()
         flash(f'URN {urn} approved.', 'info')
     else:
