@@ -2,7 +2,6 @@ import os
 
 from flask import Flask
 from flask_migrate import Migrate
-from flask_redis import FlaskRedis
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from flask_table import Table, Col
