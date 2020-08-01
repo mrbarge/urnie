@@ -5,20 +5,19 @@ class Config(object):
     DEBUG = False
     TESTING = False
     CSRF_ENABLED = True
-    SECRET_KEY = 'changeme'
-
-
-class ProductionConfig(Config):
     if 'SECRET_KEY' in os.environ:
         SECRET_KEY = os.environ['SECRET_KEY']
     if 'DATABASE_URI' in os.environ:
         SQLALCHEMY_DATABASE_URI = os.environ['DATABASE_URI']
 
 
+class ProductionConfig(Config):
+    DEBUG = False
+    TESTING = False
+
+
 class DevelopmentConfig(Config):
     DEBUG = True
-    if 'DATABASE_URI' in os.environ:
-        SQLALCHEMY_DATABASE_URI = os.environ['DATABASE_URI']
     REDIS_URL = "redis://:password@localhost:6379/0"
 
 
