@@ -1,3 +1,4 @@
+from urnie.helper import urn_helper
 from urnie.models import db, Uri
 from urnie.urn.tables import UrnResults
 from urnie.urn.forms import AddUriForm, ListUrnsForm
@@ -10,18 +11,9 @@ urn_bp = Blueprint('urn_bp', __name__,
 
 @urn_bp.route('/')
 def list():
-    all_uris = Uri.query.filter_by(approved=True).all()
-    results = [
-        {
-            "urn": uri.key,
-            "url": uri.url,
-            "approved": uri.approved,
-            "date_added": uri.date_added
-        } for uri in all_uris
-    ]
-    table = UrnResults(results)
+    all_urns = urn_helper.get_all_urns(approved=True)
+    table = UrnResults(all_urns)
     table.classes = ['table']
-
     search_form = ListUrnsForm()
 
     return render_template('urn/list.html', form=search_form, table=table)
@@ -31,32 +23,33 @@ def list():
 def search():
     search_form = ListUrnsForm()
 
-    if search_form.validate_on_submit():
-        term = search_form.search.data
-        if term:
-            all_uris = Uri.query.filter((Uri.approved == True) & ((Uri.key.like(f"%{term}%")) | (Uri.url.like(f"%{term}%")))).all()
-            results = [
-                {
-                    "urn": uri.key,
-                    "url": uri.url,
-                    "approved": uri.approved,
-                    "date_added": uri.date_added
-                } for uri in all_uris
-            ]
-            table = UrnResults(results)
-            table.classes = ['table']
-
-            return render_template('urn/list.html', form=search_form, table=table)
+    try:
+        if search_form.validate_on_submit():
+            term = search_form.search.data
+            if term:
+                matching_urns = urn_helper.search_urn(term)
+                table = UrnResults(matching_urns)
+                table.classes = ['table']
+                return render_template('urn/list.html', form=search_form, table=table)
+    except Exception as err:
+        flash(f'An error occurred whilst searching: {err}', 'error')
 
     return redirect(url_for('urn_bp.list'))
 
 
 @urn_bp.route('/<urn>', methods=['GET'])
 def go(urn):
-    url = get_url(urn)
-    if url is None:
-        return render_template('urn/notfound.html', urn=urn)
-    return render_template('urn/redirect.html', url=str(url))
+    try:
+        u = urn_helper.get_urn(urn)
+    except Exception as e:
+        return render_template('urn/notfound.html', urn=urn, close_matches=[])
+
+    if u is None:
+        # get similar matches
+        matches = urn_helper.get_urns_like(urn)
+        return render_template('urn/notfound.html', urn=urn, close_matches=matches)
+
+    return render_template('urn/redirect.html', url=u['url'])
 
 
 @urn_bp.route('/add', methods=['GET', 'POST'])
@@ -65,29 +58,19 @@ def add():
 
     if request.method == 'POST':
         if add_form.validate():
-            uri = request.form['urn']
+            urn = request.form['urn']
             url = request.form['url']
 
-            existing_uri = Uri.query.filter_by(key=uri).first()
-            if existing_uri is None:
-                u = Uri(key=uri, url=url, approved=False)
-                db.session.add(u)
-                db.session.commit()
-                flash(f'URN request "{uri}" has been submitted for approval.', 'info')
-            else:
-                flash(f'URN "{uri}" is already taken.', 'error')
+            try:
+                existing_urn = urn_helper.get_urn(urn)
+                if existing_urn is None:
+                    urn_helper.add_urn(urn, url)
+                    flash(f'URN request "{urn}" has been submitted for approval.', 'info')
+                else:
+                    flash(f'URN "{urn}" is already taken.', 'error')
+            except Exception as e:
+                flash(f'An error occurred adding the URN: {e}', 'error')
 
             return redirect(url_for('urn_bp.list'))
 
     return render_template('urn/add.html', form=add_form)
-
-
-def get_url(urn):
-    if urn == None:
-        return None
-
-    db_uri = Uri.query.filter_by(key=urn).first()
-    if db_uri is not None:
-        return db_uri.url
-
-    return None

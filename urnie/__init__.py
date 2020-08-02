@@ -35,8 +35,10 @@ def create_app():
         from urnie.admin.admin import admin_bp
         from urnie.urn.urn import urn_bp
         from urnie.auth.auth import auth_bp
+        from urnie.base import base_bp
 
         # add blueprints
+        app.register_blueprint(base_bp, url_prefix='/')
         app.register_blueprint(urn_bp, url_prefix='/urn')
         app.register_blueprint(admin_bp, url_prefix='/admin')
         app.register_blueprint(auth_bp, url_prefix='/auth')

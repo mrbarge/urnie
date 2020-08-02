@@ -1,5 +1,21 @@
+{% extends 'layout.html' %}
+
 {% block app_content %}
 
-Sorry, the URN {{ urn }} does not exist.
+<h3>Sorry..</h3>
+<p>
+The URN "{{ urn }}" does not exist.
+</p>
+
+{% if close_matches %}
+<p>
+Maybe you meant:
+<ul>
+{% for match in close_matches %}
+    <li><a href="/{{ match }}">{{ match }}</a></li>
+{% endfor %}
+</ul>
+{% endif %}
+</p>
 
 {% endblock %}

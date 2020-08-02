@@ -1,5 +1,6 @@
 import datetime
 
+from urnie.helper import urn_helper
 from urnie.admin.tables import PendingApproval, Approved
 from flask import Blueprint, render_template, redirect, url_for, flash, request
 from flask_login import login_required, login_manager
@@ -14,24 +15,12 @@ admin_bp = Blueprint('admin_bp', __name__,
 @admin_bp.route('/', methods=['GET', 'POST'])
 @login_required
 def list():
-    pending_urns = Uri.query.filter_by(approved=False).all()
-    pending_results = [
-        {
-            "urn": uri.key,
-            "url": uri.url
-        } for uri in pending_urns
-    ]
-    approved_urns = Uri.query.filter_by(approved=True).all()
-    approved_results = [
-        {
-            "urn": uri.key,
-            "url": uri.url
-        } for uri in approved_urns
-    ]
+    pending_urns = urn_helper.get_all_urns(approved=False)
+    approved_urns = urn_helper.get_all_urns(approved=True)
 
-    pending_table = PendingApproval(pending_results)
+    pending_table = PendingApproval(pending_urns)
     pending_table.classes = ['table']
-    approved_table = Approved(approved_results)
+    approved_table = Approved(approved_urns)
     approved_table.classes = ['table']
     return render_template('admin/approve.html', pending_table=pending_table, approved_table=approved_table)
 
@@ -39,14 +28,13 @@ def list():
 @admin_bp.route('/approve/<urn>', methods=['GET', 'POST'])
 @login_required
 def approve(urn):
-    db_uri = Uri.query.filter_by(key=urn).first()
-    if db_uri is not None:
-        db_uri.approved = True
-        db_uri.date_added = datetime.datetime.utcnow()
-        db.session.commit()
-        flash(f'URN {urn} approved.', 'info')
-    else:
-        flash(f'Could not find urn {urn}.', 'error')
+    try:
+        if urn_helper.approve_urn(urn):
+            flash(f'URN {urn} approved.', 'info')
+        else:
+            flash(f'URN {urn} could not be found.', 'error')
+    except Exception as err:
+        flash(f'An error occurred approving URN {urn}: {err}', 'error')
 
     return redirect(url_for('admin_bp.list'))
 
@@ -54,29 +42,28 @@ def approve(urn):
 @admin_bp.route('/update/<urn>', methods=['GET', 'POST'])
 @login_required
 def update(urn):
-    db_uri = Uri.query.filter_by(key=urn).first()
-    update_form = AddUriForm()
-    if db_uri:
-        if request.method == 'POST' and update_form.validate():
-            db_uri.url = update_form.url.data
-            db.session.commit()
-            flash(f'URN "{urn}" updated successfully.', 'info')
-            return redirect(url_for('admin_bp.list'))
-
-        update_form.urn.data = db_uri.key
-        update_form.url.data = db_uri.url
-    else:
+    u = urn_helper.get_urn(urn)
+    if not u:
         flash(f'URN "{urn}" could not be found.', 'error')
+        return redirect(url_for('admin_bp.list'))
+
+    update_form = AddUriForm()
+    if request.method == 'POST' and update_form.validate():
+        if urn_helper.change_urn_url(u['urn'], update_form.url.data):
+            flash(f'URN "{urn}" updated successfully.', 'info')
+        else:
+            flash(f'URN "{urn}" could not be updated.', 'error')
+        return redirect(url_for('admin_bp.list'))
+
+    update_form.urn.data = u['urn']
+    update_form.url.data = u['url']
     return render_template('admin/update.html', form=update_form)
 
 
 @admin_bp.route('/delete/<urn>', methods=['POST', 'DELETE'])
 @login_required
 def delete(urn):
-    db_uri = Uri.query.filter_by(key=urn).first()
-    if db_uri is not None:
-        db.session.delete(db_uri)
-        db.session.commit()
+    if urn_helper.delete_urn(urn):
         flash(f'URN {urn} rejected and deleted.', 'info')
     else:
         flash(f'Could not find urn {urn}.', 'error')
