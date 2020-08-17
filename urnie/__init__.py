@@ -6,25 +6,30 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from flask_table import Table, Col
 from flask_bootstrap import Bootstrap
+from flask_caching import Cache
 
 # add DB
 db = SQLAlchemy()
 migrate = Migrate()
 login_manager = LoginManager()
+cache = Cache()
 
 def create_app():
     app = Flask(__name__)
 
-    if app.config['ENV'] == 'development':
-        app.config.from_object('config.DevelopmentConfig')
+    if app.config['ENV'] == 'production':
+        app.config.from_object('config.ProductionConfig')
     elif app.config['ENV'] == 'test':
         app.config.from_object('config.TestingConfig')
+    else:
+        app.config.from_object('config.DevelopmentConfig')
 
     if 'APP_CONFIG_FILE' in os.environ:
         app.config.from_envvar('APP_CONFIG_FILE')
 
     from urnie.models import Uri, User
 
+    cache.init_app(app)
     db.init_app(app)
     login_manager.init_app(app)
     login_manager.login_view = 'auth_bp.login'

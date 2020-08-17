@@ -3,6 +3,7 @@ from urnie.models import db, Uri
 from urnie.urn.tables import UrnResults
 from urnie.urn.forms import AddUriForm, ListUrnsForm
 from flask import Blueprint, render_template, current_app, request, url_for, redirect, flash
+from urnie import cache
 
 urn_bp = Blueprint('urn_bp', __name__,
                    template_folder='templates',
@@ -38,6 +39,7 @@ def search():
 
 
 @urn_bp.route('/<urn>', methods=['GET'])
+@cache.cached(timeout=300)
 def go(urn):
     try:
         u = urn_helper.get_urn(urn)

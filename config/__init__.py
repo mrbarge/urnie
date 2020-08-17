@@ -18,7 +18,8 @@ class ProductionConfig(Config):
 
 class DevelopmentConfig(Config):
     DEBUG = True
-    REDIS_URL = "redis://:password@localhost:6379/0"
+    CACHE_TYPE = 'simple'
+    CACHE_DEFAULT_TIMEOUT = 300
 
 
 class TestingConfig(Config):
