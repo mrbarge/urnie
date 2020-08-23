@@ -58,6 +58,7 @@ def go(urn):
 def add():
     add_form = AddUriForm()
 
+    # if len(pending_urns)
     if request.method == 'POST':
         if add_form.validate():
             urn = request.form['urn']
@@ -74,5 +75,12 @@ def add():
                 flash(f'An error occurred adding the URN: {e}', 'error')
 
             return redirect(url_for('urn_bp.list'))
+
+    # check if we have reached the maximum pending
+    pending_limit_reached = False
+    pending_urns = urn_helper.get_all_urns(approved=False)
+    if 'MAX_PENDING_URNS' in current_app.config and len(pending_urns) > current_app.config['MAX_PENDING_URNS']:
+        flash(f'Suggestions are paused because too many are waiting for approval. Please try again later.', 'info')
+        return redirect(url_for('urn_bp.list'))
 
     return render_template('urn/add.html', form=add_form)

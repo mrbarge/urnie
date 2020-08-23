@@ -9,6 +9,12 @@ class Config(object):
         SECRET_KEY = os.environ['SECRET_KEY']
     if 'DATABASE_URI' in os.environ:
         SQLALCHEMY_DATABASE_URI = os.environ['DATABASE_URI']
+    # Maximum number of pending URNs before suggestions are disallowed
+    MAX_PENDING_URNS = 30
+    # Cache URN requests, default to in-memory
+    CACHE_TYPE = 'simple'
+    # Cache URN requests for the specified number of seconds
+    CACHE_DEFAULT_TIMEOUT = 300
 
 
 class ProductionConfig(Config):
@@ -18,10 +24,8 @@ class ProductionConfig(Config):
 
 class DevelopmentConfig(Config):
     DEBUG = True
-    CACHE_TYPE = 'simple'
-    CACHE_DEFAULT_TIMEOUT = 300
 
 
 class TestingConfig(Config):
     TESTING = True
-    REDIS_URL = "redis://:password@localhost:6379/0"
+    DEBUG = True
