@@ -24,8 +24,11 @@ class ProductionConfig(Config):
 
 class DevelopmentConfig(Config):
     DEBUG = True
-
+    SECRET_KEY = 'development'
 
 class TestingConfig(Config):
     TESTING = True
     DEBUG = True
+    SECRET_KEY = 'testing'
+    WTF_CSRF_ENABLED = False
+    CSRF_ENABLED = False
