@@ -1,11 +1,16 @@
 import datetime
 import sqlalchemy
 from fuzzywuzzy import process
-
+from flask import app
 from urnie.models import db, Uri
 
 
 def get_all_urns(approved=True):
+    '''
+    Retrieve all URNs from the database.
+    :param approved: Only approved URNs will be returned.
+    :return: List of URNs
+    '''
     try:
         all_uris = Uri.query.filter_by(approved=approved).all()
     except sqlalchemy.exc.SQLAlchemyError:
@@ -23,6 +28,11 @@ def get_all_urns(approved=True):
 
 
 def search_urn(term):
+    '''
+    Search for an URN matching the specified term
+    :param term: Term to search for
+    :return: URN
+    '''
     try:
         all_uris = Uri.query.filter(
             (Uri.approved == True) & ((Uri.key.like(f"%{term}%")) | (Uri.url.like(f"%{term}%")))).all()
@@ -42,6 +52,11 @@ def search_urn(term):
 
 
 def get_urn(urn):
+    '''
+    Return the details of a specific URN
+    :param urn: URN to retrieve
+    :return:
+    '''
     try:
         db_urn = Uri.query.filter_by(key=urn).first()
     except sqlalchemy.exc.SQLAlchemyError:
@@ -51,15 +66,20 @@ def get_urn(urn):
         return None
 
     results = {
-            "urn": db_urn.key,
-            "url": db_urn.url,
-            "approved": db_urn.approved,
-            "date_added": db_urn.date_added
-        }
+        "urn": db_urn.key,
+        "url": db_urn.url,
+        "approved": db_urn.approved,
+        "date_added": db_urn.date_added
+    }
     return results
 
 
 def get_urns_like(urn):
+    '''
+    Return URNs that are similar to the supplied urn
+    :param urn: URN used for matching
+    :return:
+    '''
     try:
         all_urns = get_all_urns()
     except Exception:
@@ -74,6 +94,12 @@ def get_urns_like(urn):
 
 
 def add_urn(urn, url):
+    '''
+    Add a new URN to the database
+    :param urn: URN Key
+    :param url: URN URL
+    :return:
+    '''
     u = Uri(key=urn, url=url, approved=False)
     try:
         db.session.add(u)
@@ -83,6 +109,11 @@ def add_urn(urn, url):
 
 
 def approve_urn(urn):
+    '''
+    Approve an URN in the database
+    :param urn: URN to approve
+    :return:
+    '''
     try:
         u = Uri.query.filter_by(key=urn).first()
         if u:
@@ -95,6 +126,12 @@ def approve_urn(urn):
 
 
 def change_urn_url(urn, url):
+    '''
+    Update an URN's URL
+    :param urn: URN key
+    :param url: URN URL
+    :return:
+    '''
     try:
         u = Uri.query.filter_by(key=urn).first()
         if u:
@@ -106,6 +143,11 @@ def change_urn_url(urn, url):
 
 
 def delete_urn(urn):
+    '''
+    Delete the specified URN from the database
+    :param urn: URN key
+    :return:
+    '''
     try:
         u = Uri.query.filter_by(key=urn).first()
         if u is not None:
@@ -114,4 +156,3 @@ def delete_urn(urn):
         return u
     except sqlalchemy.exc.SQLAlchemyError:
         raise Exception('a database error occurred')
-

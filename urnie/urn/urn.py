@@ -1,8 +1,8 @@
-from urnie.helper import urn_helper
+from urnie.helper import urn_helper, exporter
 from urnie.models import db, Uri
 from urnie.urn.tables import UrnResults
 from urnie.urn.forms import AddUriForm, ListUrnsForm
-from flask import Blueprint, render_template, current_app, request, url_for, redirect, flash
+from flask import Blueprint, render_template, current_app, request, url_for, redirect, flash, Response
 from urnie import cache
 
 urn_bp = Blueprint('urn_bp', __name__,
@@ -58,7 +58,6 @@ def go(urn):
 def add():
     add_form = AddUriForm()
 
-    # if len(pending_urns)
     if request.method == 'POST':
         if add_form.validate():
             urn = request.form['urn']
@@ -84,3 +83,19 @@ def add():
         return redirect(url_for('urn_bp.list'))
 
     return render_template('urn/add.html', form=add_form)
+
+
+@urn_bp.route('/export-json', methods=['GET'])
+def export_json():
+    all_urns = urn_helper.get_all_urns(approved=True)
+    urn_json = exporter.generate_export_json(all_urns)
+    return Response(urn_json, mimetype='application/json',
+                    headers={'Content-Disposition': 'attachment;filename=urns.json'})
+
+
+@urn_bp.route('/export-html', methods=['GET'])
+def export_html():
+    all_urns = urn_helper.get_all_urns(approved=True)
+    urn_html = exporter.generate_export_html(all_urns)
+    return Response(urn_html, mimetype='text/html',
+                    headers={'Content-Disposition': 'attachment;filename=urns.html'})

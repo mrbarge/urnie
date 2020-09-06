@@ -6,9 +6,10 @@
 
 {% block navbar %}
     <nav class="navbar navbar-default">
-       <div class="container">
+        <div class="container">
             <div class="navbar-header">
-                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                        data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
                     <span class="sr-only">Toggle navigation</span>
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
@@ -20,13 +21,20 @@
                 <ul class="nav navbar-nav">
                     <li><a href="{{ url_for('urn_bp.list') }}">List URNs</a></li>
                     <li><a href="{{ url_for('urn_bp.add') }}">Suggest a URN</a></li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Export As <span class="caret"></span></a>
+                        <ul class="dropdown-menu" role="menu">
+                            <li><a href="{{ url_for('urn_bp.export_json') }}">JSON</a></li>
+                            <li><a href="{{ url_for('urn_bp.export_html') }}">HTML</a></li>
+                        </ul>
+                    </li>
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
                     {% if current_user.is_anonymous %}
-                    <li><a href="{{ url_for('auth_bp.login') }}">Login</a></li>
+                        <li><a href="{{ url_for('auth_bp.login') }}">Login</a></li>
                     {% else %}
-                    <li><a href="{{ url_for('admin_bp.list') }}">Admin</a></li>
-                    <li><a href="{{ url_for('auth_bp.logout') }}">Logout</a></li>
+                        <li><a href="{{ url_for('admin_bp.list') }}">Admin</a></li>
+                        <li><a href="{{ url_for('auth_bp.logout') }}">Logout</a></li>
                     {% endif %}
                 </ul>
             </div>
@@ -37,11 +45,11 @@
 {% block content %}
     <div class="container">
         {% with messages = get_flashed_messages() %}
-        {% if messages %}
-            {% for message in messages %}
-            <div class="alert alert-info" role="alert">{{ message }}</div>
-            {% endfor %}
-        {% endif %}
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-info" role="alert">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
         {% endwith %}
 
         {# application content needs to be provided in the app_content block #}
