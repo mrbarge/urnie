@@ -12,7 +12,7 @@ The URN "{{ urn }}" does not exist.
 Maybe you meant:
 <ul>
 {% for match in close_matches %}
-    <li><a href="/{{ match }}">{{ match }}</a></li>
+    <li><a href="{{ match }}">{{ match }}</a></li>
 {% endfor %}
 </ul>
 {% endif %}
