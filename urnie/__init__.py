@@ -7,14 +7,17 @@ from flask_login import LoginManager
 from flask_table import Table, Col
 from flask_bootstrap import Bootstrap
 from flask_caching import Cache
+from prometheus_flask_exporter import PrometheusMetrics
 
 # add DB
 db = SQLAlchemy()
 migrate = Migrate()
 login_manager = LoginManager()
 cache = Cache()
+metrics = None
 
 def create_app():
+    global metrics
     app = Flask(__name__)
 
     if app.config['ENV'] == 'production':
@@ -34,6 +37,7 @@ def create_app():
     login_manager.init_app(app)
     login_manager.login_view = 'auth_bp.login'
     migrate.init_app(app, db)
+    metrics = PrometheusMetrics(app)
     bootstrap = Bootstrap(app)
 
     with app.app_context():
