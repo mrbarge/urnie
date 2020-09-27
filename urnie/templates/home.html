@@ -14,7 +14,25 @@
         </div>
     </header>
 
-    {%  block footer %}
+    <link rel="search">
+    <section class="howto">
+        <div class="container-fluid p-0">
+            <div class="row no-gutters">
+                <div class="col-lg-6 order-lg-2 text-white howto-img"
+                     style="background-image: url('{{ url_for('urn_bp.home') }}/../../static/img/how-to-1.png');"></div>
+                <div class="col-lg-6 order-lg-1 my-auto howto-text">
+                    <h2>Get Started..</h2>
+                    <ol class="lead mb-0">
+                        <li>Bookmark this page!</li>
+                        <li>Add "/%s" to the end of the bookmark URL</li>
+                        <li>Set the keyword (eg. "go")</li>
+                        <li>"go urnie"</li>
+                    </ol>
+                </div>
+            </div>
+    </section>
+
+    {% block footer %}
         {% include 'footer.html' %}
     {%- endblock footer %}
 {%- endblock content %}

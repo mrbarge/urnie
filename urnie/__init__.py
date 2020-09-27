@@ -48,7 +48,7 @@ def create_app():
 
         # add blueprints
         app.register_blueprint(base_bp, url_prefix='/')
-        app.register_blueprint(urn_bp, url_prefix='/urn')
+        app.register_blueprint(urn_bp, url_prefix='/go')
         app.register_blueprint(admin_bp, url_prefix='/admin')
         app.register_blueprint(auth_bp, url_prefix='/auth')
 

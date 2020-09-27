@@ -24,11 +24,10 @@ def list():
 @urn_bp.route('/')
 def home():
     go_form = GoForm()
-    return render_template('urn/home.html', form=go_form)
-
-
-# search_form = ListUrnsForm()
-# return render_template('urn/home.html', form=search_form)
+    from urllib.parse import urlparse
+    o = urlparse(request.base_url)
+    host = o.hostname
+    return render_template('urn/home.html', form=go_form, host=host)
 
 
 @urn_bp.route('/search', methods=['GET', 'POST'])

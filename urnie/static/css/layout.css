@@ -37,8 +37,8 @@ header.masthead h1 {
 
 @media (min-width: 768px) {
   header.masthead {
-    padding-top: 32rem;
-    padding-bottom: 30rem;
+    padding-top: 12rem;
+    padding-bottom: 12rem;
   }
   header.masthead h1 {
     font-size: 3rem;
@@ -48,4 +48,19 @@ header.masthead h1 {
 footer.footer {
   padding-top: 4rem;
   padding-bottom: 4rem;
+}
+
+.howto .howto-text {
+  padding: 3rem;
+}
+
+.howto .howto-img {
+  min-height: 30rem;
+  background-size: cover;
+}
+
+@media (min-width: 768px) {
+  .howto .howto-text {
+    padding: 7rem;
+  }
 }

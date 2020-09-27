@@ -12,5 +12,3 @@ psycopg2==2.8.4
 fuzzywuzzy==0.18.0
 yattag==1.14.0
 prometheus-flask-exporter==0.18.0
-# testing
-pytest

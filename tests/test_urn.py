@@ -3,7 +3,7 @@ import os
 import pytest
 from urllib.parse import urlparse
 
-from urn.forms import AddUriForm
+from urnie.urn.forms import AddUriForm
 from urnie import create_app
 
 TEST_URN_KEY='test'
@@ -25,14 +25,14 @@ def app(mocker):
 
 def test_go(app):
     with app.test_client() as c:
-        response = c.get(f'/urn/{TEST_URN_KEY}', follow_redirects=True)
+        response = c.get(f'/go/{TEST_URN_KEY}', follow_redirects=True)
         response_data = response.get_data(as_text=True)
         assert f'<meta http-equiv="refresh" content="0; URL={TEST_URN_URL}"/>' in response_data
         assert response.status_code == 200
 
 def test_go_urn_exists(app):
     with app.test_client() as c:
-        response = c.get(f'/urn/{TEST_URN_KEY}', follow_redirects=True)
+        response = c.get(f'/go/{TEST_URN_KEY}', follow_redirects=True)
         response_data = response.get_data(as_text=True)
         assert f'<meta http-equiv="refresh" content="0; URL={TEST_URN_URL}"/>' in response_data
         assert response.status_code == 200
@@ -41,6 +41,6 @@ def test_add_urn_exists(app):
     with app.test_request_context():
         with app.test_client() as c:
             addform = AddUriForm(urn=TEST_URN_KEY, url=TEST_URN_URL)
-            response = c.post('/urn/add', data=addform.data)
+            response = c.post('/go/add', data=addform.data)
             response_data = response.get_data(as_text=True)
             assert response.status_code == 302
