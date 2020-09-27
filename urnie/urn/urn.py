@@ -1,7 +1,9 @@
+import json
+
 from urnie.helper import urn_helper, exporter
 from urnie.models import db, Uri
 from urnie.urn.tables import UrnResults
-from urnie.urn.forms import AddUriForm, ListUrnsForm
+from urnie.urn.forms import AddUriForm, ListUrnsForm, GoForm
 from flask import Blueprint, render_template, current_app, request, url_for, redirect, flash, Response
 from urnie import cache, metrics
 
@@ -10,17 +12,26 @@ urn_bp = Blueprint('urn_bp', __name__,
                    static_folder='static', static_url_path='assets')
 
 
-@urn_bp.route('/')
+@urn_bp.route('/list')
 def list():
     all_urns = urn_helper.get_all_urns(approved=True)
     table = UrnResults(all_urns)
     table.classes = ['table']
     search_form = ListUrnsForm()
-
     return render_template('urn/list.html', form=search_form, table=table)
 
 
-@urn_bp.route('/search', methods=['POST'])
+@urn_bp.route('/')
+def home():
+    go_form = GoForm()
+    return render_template('urn/home.html', form=go_form)
+
+
+# search_form = ListUrnsForm()
+# return render_template('urn/home.html', form=search_form)
+
+
+@urn_bp.route('/search', methods=['GET', 'POST'])
 def search():
     search_form = ListUrnsForm()
 
@@ -28,7 +39,7 @@ def search():
         if search_form.validate_on_submit():
             term = search_form.search.data
             if term:
-                matching_urns = urn_helper.search_urn(term)
+                matching_urns = urn_helper.search_term(term)
                 table = UrnResults(matching_urns)
                 table.classes = ['table']
                 return render_template('urn/list.html', form=search_form, table=table)
@@ -38,10 +49,21 @@ def search():
     return redirect(url_for('urn_bp.list'))
 
 
+@urn_bp.route('/_autocomplete')
+@cache.cached(timeout=900)
+def autocomplete():
+    try:
+        all_urns = urn_helper.get_all_urns()
+        urn_names = [u['urn'] for u in all_urns]
+        return Response(json.dumps(urn_names), mimetype='application/json')
+    except Exception as err:
+        return Response("[]", mimetype='application/json')
+
+
 @urn_bp.route('/<urn>', methods=['GET'])
 @metrics.do_not_track()
 @metrics.counter('invocation_by_urn', 'Number of invocations by URN',
-         labels={'urn': lambda: request.view_args['urn']})
+                 labels={'urn': lambda: request.view_args['urn']})
 @cache.cached(timeout=300)
 def go(urn):
     try:

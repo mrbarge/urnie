@@ -27,11 +27,11 @@ def get_all_urns(approved=True):
     return results
 
 
-def search_urn(term):
+def search_term(term):
     '''
-    Search for an URN matching the specified term
+    Search for an URN or URL matching the specified term
     :param term: Term to search for
-    :return: URN
+    :return: Matching URN entries
     '''
     try:
         all_uris = Uri.query.filter(

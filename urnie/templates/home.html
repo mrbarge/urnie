@@ -1,0 +1,21 @@
+{% extends 'header.html' %}
+
+{% block styles %}
+    {{ super() }}
+    <link href="{{ url_for('urn_bp.home') }}/../../static/css/layout.css" rel="stylesheet">
+{% endblock styles %}
+
+{% block content %}
+    <header class="masthead text-center">
+        <div class="overlay"></div>
+        <div class="container">
+            {# application content needs to be provided in the app_content block #}
+            {% block app_content %}{% endblock %}
+        </div>
+    </header>
+
+    {%  block footer %}
+        {% include 'footer.html' %}
+    {%- endblock footer %}
+{%- endblock content %}
+

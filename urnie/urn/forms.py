@@ -4,8 +4,13 @@ from wtforms.validators import ValidationError, DataRequired, URL
 from flask import current_app
 
 
+class GoForm(FlaskForm):
+    search = StringField("Let's go..", id='urn_autocomplete', validators=[validators.optional(), validators.length(max=200)])
+    submit = SubmitField('Go')
+
+
 class ListUrnsForm(FlaskForm):
-    search = StringField('Search on URN or URL..', [validators.optional(), validators.length(max=200)])
+    search = StringField('Search on URN or URL..', validators=[validators.optional(), validators.length(max=200)])
     submit = SubmitField('Search')
 
 

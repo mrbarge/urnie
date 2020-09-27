@@ -2,32 +2,27 @@
 
 {% block app_content %}
 
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        {% for category, message in messages %}
-        <div class="alert alert-success" role="alert"><b>{{ category }}</b>: {{ message }}</div>
-        {% endfor %}
-      {% endif %}
-    {% endwith %}
-
-   <form action="" method="post" novalidate>
+   <form action="" method="post" novalidate class="form-inline">
         {{ form.hidden_tag() }}
         <p>
+            <div class="form-group mx-sm-3 mb-2">
             {{ form.urn.label }}<br>
-            {{ form.urn(size=30) }}
+            {{ form.urn(size=30, class='form-control', placeholder='Enter a descriptive word') }}
             {% for error in form.urn.errors %}
             <span style="color: red;">[{{ error }}]</span>
             {% endfor %}
-
+            </div>
         </p>
         <p>
+            <div class="form-group mx-sm-3 mb-2">
             {{ form.url.label }}<br>
-            {{ form.url(size=60) }}
+            {{ form.url(size=60, class='form-control', placeholder='Enter the destination URL for the URN') }}
             {% for error in form.url.errors %}
             <span style="color: red;">[{{ error }}]</span>
             {% endfor %}
+            </div>
         </p>
-        <p>{{ form.submit() }}</p>
+        <p>{{ form.submit(class='btn btn-primary mb-2') }}</p>
    </form>
 
 {% endblock %}

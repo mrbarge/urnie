@@ -6,4 +6,4 @@ base_bp = Blueprint('base_bp', __name__)
 
 @base_bp.route('/')
 def base():
-    return redirect(url_for('urn_bp.list'))
+    return redirect(url_for('urn_bp.home'))

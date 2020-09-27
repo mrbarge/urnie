@@ -1,0 +1,36 @@
+{% extends 'home.html' %}
+
+{% block scripts %}
+    {{ super() }}
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.js"></script>
+    <script>
+        $(function () {
+            $.ajax({
+                url: '{{ url_for("urn_bp.autocomplete") }}'
+            }).done(function (data) {
+                $('#urn_autocomplete').autocomplete({source: data, minLength: 2});
+            });
+        });
+    </script>
+{% endblock %}
+
+{% block app_content %}
+    <div class="row">
+        <div class="col-md-10 col-lg-8 col-xl-7 mx-auto">
+            <form action="{{ url_for('urn_bp.search') }}" method="post">
+                {{ form.hidden_tag() }}
+                <div class="form-row">
+{#                    <div class="col-13 col-md-9 mb-2 mb-md-0">#}
+                    <div class="col col-md-10 mb-2 mb-md-0">
+                        {{ form.search(size=30, class='form-control input-lg', placeholder="Let's go..") }}
+                    </div>
+{#                    <div class="col-12 col-md-3">#}
+                    <div class="col col-md-2">
+                        {{ form.submit(class='btn btn-block btn-lg btn-primary') }}
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}
+
