@@ -40,10 +40,6 @@ def create_app():
     metrics = PrometheusMetrics(app)
     bootstrap = Bootstrap(app)
 
-    from flask_bootstrap import WebCDN
-    app.extensions['bootstrap']['cdns']['jquery'] = WebCDN(
-        '//cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/'
-    )
     with app.app_context():
         from urnie.admin.admin import admin_bp
         from urnie.urn.urn import urn_bp
