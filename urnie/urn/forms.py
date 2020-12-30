@@ -5,7 +5,8 @@ from flask import current_app
 
 
 class GoForm(FlaskForm):
-    search = StringField("Let's go..", id='urn_autocomplete', validators=[validators.optional(), validators.length(max=200)])
+    search = StringField("Let's go..", id='urn_autocomplete',
+                         validators=[validators.optional(), validators.length(max=200)])
     submit = SubmitField('Go')
 
 
@@ -20,6 +21,8 @@ class AddUriForm(FlaskForm):
     submit = SubmitField('Submit')
 
     def validate_urn(form, field):
+        if ' ' in str(field.data) or '\t' in str(field.data):
+            raise ValidationError('URN cannot contain whitespace')
         for rule in current_app.url_map.iter_rules():
             print(str(rule))
             if str(rule).endswith('/' + field.data):

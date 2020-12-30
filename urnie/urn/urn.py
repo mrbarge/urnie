@@ -1,6 +1,6 @@
 import json
 
-from urnie.helper import urn_helper, exporter
+from urnie.helper import urn_helper, exporter, urn_processors
 from urnie.models import db, Uri
 from urnie.urn.tables import UrnResults
 from urnie.urn.forms import AddUriForm, ListUrnsForm, GoForm
@@ -62,20 +62,34 @@ def autocomplete():
 @urn_bp.route('/<urn>', methods=['GET'])
 @metrics.do_not_track()
 @metrics.counter('invocation_by_urn', 'Number of invocations by URN',
-                 labels={'urn': lambda: request.view_args['urn']})
+                 labels={'urn': lambda: str(request.view_args['urn']).split(' ', 1)})
 @cache.cached(timeout=300)
 def go(urn):
+
+    # Split URN from any tailing arguments
+    urn_params = str(urn).split(' ', 1)
+    if len(urn_params) == 0:
+        return render_template('urn/notfound.html', urn='', close_matches=[])
+
+    # retrive URN destination
     try:
-        u = urn_helper.get_urn(urn)
+        u = urn_helper.get_urn(urn_params[0])
+        if u is None:
+            # get similar matches
+            matches = urn_helper.get_urns_like(urn_params[0])
+            return render_template('urn/notfound.html', urn=urn_params[0], close_matches=matches)
+
     except Exception as e:
-        return render_template('urn/notfound.html', urn=urn, close_matches=[])
+        return render_template('urn/notfound.html', urn=urn_params[0], close_matches=[])
 
-    if u is None:
-        # get similar matches
-        matches = urn_helper.get_urns_like(urn)
-        return render_template('urn/notfound.html', urn=urn, close_matches=matches)
+    # apply processing
+    dest_url = u['url']
+    if len(urn_params) > 1:
+        dest_url = urn_processors.process_urn_url(dest_url, urn_params[1])
+    else:
+        dest_url = urn_processors.process_urn_url(dest_url, '')
 
-    return render_template('urn/redirect.html', url=u['url'])
+    return render_template('urn/redirect.html', url=dest_url)
 
 
 @urn_bp.route('/add', methods=['GET', 'POST'])
@@ -97,7 +111,7 @@ def add():
             except Exception as e:
                 flash(f'An error occurred adding the URN: {e}', 'error')
 
-            return redirect(url_for('urn_bp.list'))
+        return redirect(url_for('urn_bp.list'))
 
     # check if we have reached the maximum pending
     pending_limit_reached = False
