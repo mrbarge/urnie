@@ -64,3 +64,19 @@ footer.footer {
     padding: 7rem;
   }
 }
+
+.row {
+  display: flex;
+}
+
+.column {
+  flex: 50%;
+}
+
+#rcorners2 {
+  border-radius: 25px;
+  border: 2px solid #CCCCCC;
+  padding: 20px;
+  /*width: 300px;*/
+  height: 200px;
+}

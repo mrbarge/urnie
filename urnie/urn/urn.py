@@ -65,13 +65,12 @@ def autocomplete():
                  labels={'urn': lambda: str(request.view_args['urn']).split(' ', 1)})
 @cache.cached(timeout=300)
 def go(urn):
-
     # Split URN from any tailing arguments
     urn_params = str(urn).split(' ', 1)
     if len(urn_params) == 0:
         return render_template('urn/notfound.html', urn='', close_matches=[])
 
-    # retrive URN destination
+    # retrieve URN destination
     try:
         u = urn_helper.get_urn(urn_params[0])
         if u is None:
