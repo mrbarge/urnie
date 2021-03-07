@@ -1,7 +1,8 @@
+import shlex
 from typing import List
 
 VALUE_PROCESS_FLAG = ('%v', 'Insert parameter as-is', lambda x, y: x.replace('%v', y))
-JQL_PROCESS_FLAG = ('%j', 'Translate to JQL text search', lambda x, y: jira_textsearch(x, y.split(' ')))
+JQL_PROCESS_FLAG = ('%j', 'Translate to JQL text search', lambda x, y: jira_textsearch(x, shlex.split(y)))
 
 
 def substitute(url: str, val: str):
