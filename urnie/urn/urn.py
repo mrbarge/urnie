@@ -91,6 +91,14 @@ def go(urn):
     return render_template('urn/redirect.html', url=dest_url)
 
 
+@urn_bp.route('/go/', methods=['POST'])
+@metrics.do_not_track()
+@cache.cached(timeout=300)
+def form_go():
+    search = request.form['search']
+    return redirect(url_for('urn_bp.go', urn=search))
+
+
 @urn_bp.route('/add', methods=['GET', 'POST'])
 def add():
     add_form = AddUriForm()
