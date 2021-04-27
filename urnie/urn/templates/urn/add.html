@@ -35,7 +35,8 @@
                 The following optional helpers can be inserted into the URL to modify it before redirection:<br/>
                 <ul>
                     <li>%v - Insert the value of the first parameter, as-is</li>
-                    <li>%j - Translate parameters into a Jira JQL text/comment search</li>
+                    <li>%j - Translate parameters into a Jira JQL fuzzy text/comment search</li>
+                    <li>%J - Translate parameters into a Jira JQL exact text/comment search</li>
                 </ul>
                 eg. an URN of "test" with a URL of "https://test.com/search?q=%v" will make "test hello" redirect to "https://test.com/search?q=hello"<br/>
             </div>

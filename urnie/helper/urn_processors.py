@@ -2,7 +2,8 @@ import shlex
 from typing import List
 
 VALUE_PROCESS_FLAG = ('%v', 'Insert parameter as-is', lambda x, y: x.replace('%v', y))
-JQL_PROCESS_FLAG = ('%j', 'Translate to JQL text search', lambda x, y: jira_textsearch(x, shlex.split(y)))
+JQL_PROCESS_FLAG = ('%j', 'Translate to JQL fuzzy text search', lambda x, y: jira_textsearch(x, shlex.split(y)))
+JQL_EXACT_PROCESS_FLAG = ('%J', 'Translate to JQL exact text search', lambda x, y: jira_textsearch_exact(x, shlex.split(y)))
 
 
 def substitute(url: str, val: str):
@@ -18,6 +19,15 @@ def jira_textsearch(url: str, val: List[str]):
     return url.replace('%j', search_term)
 
 
+def jira_textsearch_exact(url: str, val: List[str]):
+    search_term = ''
+    for term in val:
+        if search_term != '':
+            search_term += ' AND '
+        search_term += f'(text ~ "\\\"{term}\\\"" OR comment ~ "\\\"{term}\\\"")'
+    return url.replace('%J', search_term)
+
+
 def process_urn_url(url, urn_param):
     if not url:
         return url
@@ -29,5 +39,6 @@ def process_urn_url(url, urn_param):
 def get_processors():
     return [
         VALUE_PROCESS_FLAG,
-        JQL_PROCESS_FLAG
+        JQL_PROCESS_FLAG,
+        JQL_EXACT_PROCESS_FLAG
     ]
